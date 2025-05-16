@@ -56,7 +56,7 @@ The examples are structured and explained with simple, real-world datasets.
 
 Make sure you have the following installed:
 
-- Python 3.6+
+- Python 3.10+
 - `scikit-learn`
 - `pandas`
 - `numpy`
@@ -67,7 +67,6 @@ Install all requirements with:
 
 ```bash
 pip install -r requirements.txt
-=======
 # Machine_learning_sklearn
 Machine_learning_sklearn
->>>>>>> 1f87a5e (Initial commit)
+
