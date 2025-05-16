@@ -67,3 +67,7 @@ Install all requirements with:
 
 ```bash
 pip install -r requirements.txt
+=======
+# Machine_learning_sklearn
+Machine_learning_sklearn
+>>>>>>> 1f87a5e (Initial commit)
