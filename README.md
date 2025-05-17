@@ -50,8 +50,6 @@ The examples are structured and explained with simple, real-world datasets.
 - Decision boundaries
 - Confusion matrix and learning curves
 
----
-
 ## 🛠️ Requirements
 
 Make sure you have the following installed:
@@ -67,6 +65,7 @@ Install all requirements with:
 
 ```bash
 pip install -r requirements.txt
+<<<<<<< HEAD
 # Machine_learning_sklearn
 Machine_learning_sklearn
 
