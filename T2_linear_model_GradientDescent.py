@@ -25,6 +25,11 @@ def compute_error(y_hat, y_true):
     mse = np.mean(error ** 2)
     return mae, mse
 
+def r2(y_hat, y_true):
+    ss_res = np.sum((y_hat - y_true) ** 2)
+    ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+    return 1 - (ss_res / ss_tot)
+
 # ────────────────────────────────
 # Gradient Descent Implementation
 # ────────────────────────────────
@@ -47,9 +52,9 @@ def gradient_descent(x, y, w0, w1, learning_rate=0.01, iterations=1000):
         # Record MSE
         _, mse = compute_error(y_hat, y)
         mse_history.append(mse)
-
+        r2_error = r2(y_hat, y)
         if i % 100 == 0 or i == iterations - 1:
-            print(f"[Epoch {i+1:4d}] MSE: {mse:.5f}, w1: {w1:.5f}, w0: {w0:.5f}")
+            print(f"[Epoch {i+1:4d}] MSE: {mse:.5f}, w1: {w1:.5f}, w0: {w0:.5f} r2_error: {r2_error:.4f}")
 
     return w0, w1, mse_history
 
@@ -69,7 +74,7 @@ w0_final, w1_final, mse_hist = gradient_descent(x_train, y_train, w0_init, w1_in
 # ────────────────────────────────
 y_pred_test = linear_model(x_test, w0_final, w1_final)
 mae_test, mse_test = compute_error(y_pred_test, y_test)
-print(f"\nTest MAE: {mae_test:.4f}, Test MSE: {mse_test:.4f}")
+print(f"\nTest MAE: {mae_test:.4f}, Test MSE: {mse_test:.4f} R2 error: {r2(y_pred_test, y_test):.4f}")
 
 # ────────────────────────────────
 # Plot Results
