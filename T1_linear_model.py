@@ -240,3 +240,109 @@ plt.ylabel("MSE")
 plt.grid(True)
 plt.show()
 
+
+# Define the function f(x) = x^2
+def func_x2(x):
+    return x**2
+
+# Define the gradient of f(x)
+def gradfuncx2(x):
+    return 2 * x
+
+# Setup for plotting
+x_vals = np.linspace(-5, 5, 400)
+y_vals = func_x2(x_vals)
+
+# Gradient descent parameters
+xi = -4           # initial value
+alpha = 0.1       # learning rate
+iterations = 20   # number of steps
+
+# To store values
+path_x = [xi]
+path_y = [func_x2(xi)]
+
+# Perform gradient descent
+for i in range(iterations):
+    grad = gradfuncx2(xi)
+    xi = xi - alpha * grad
+    path_x.append(xi)
+    path_y.append(func_x2(xi))
+    print(f"Step {i+1:02d}: x = {xi:.6f}, f(x) = {path_y[-1]:.6f}, grad = {grad:.6f}")
+
+# Plot function and gradient descent steps
+plt.figure(figsize=(8, 5))
+plt.plot(x_vals, y_vals, label=r"$f(x) = x^2$", linewidth=2)
+plt.scatter(path_x, path_y, color="red", label="Descent steps", zorder=5)
+plt.plot(path_x, path_y, color="red", linestyle="--", alpha=0.6)
+
+plt.title("Gradient Descent on $f(x) = x^2$")
+plt.xlabel("x")
+plt.ylabel("f(x)")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# Define the 3D function
+def func_3d(x, y):
+    return x**2 + y**2
+
+# Define the gradient of the function
+def gradfunc3d(x, y):
+    return 2 * x, 2 * y
+
+# Create a meshgrid for plotting the surface
+x_vals, y_vals = np.meshgrid(np.linspace(-5, 5, 400), np.linspace(-5, 5, 400))
+z_vals = func_3d(x_vals, y_vals)
+
+# Initialize descent parameters
+xi, yi = 4.0, 4.0          # Initial point
+alpha = 0.9                # Learning rate
+iterations = 30            # Number of steps
+
+# Track descent path
+path_x = [xi]
+path_y = [yi]
+path_z = [func_3d(xi, yi)]
+
+# Gradient Descent Loop
+for i in range(iterations):
+    grad_x, grad_y = gradfunc3d(xi, yi)
+    xi -= alpha * grad_x
+    yi -= alpha * grad_y
+    zi = func_3d(xi, yi)
+
+    path_x.append(xi)
+    path_y.append(yi)
+    path_z.append(zi)
+
+    print(f"Step {i+1:02d}: x = {xi:.6f}, y = {yi:.6f}, f(x, y) = {zi:.6f}, grad = ({grad_x:.6f}, {grad_y:.6f})")
+
+# ──────────────────── 3D Plot ──────────────────────
+fig = plt.figure(figsize=(10, 5))
+
+# 3D surface + descent path
+ax3d = fig.add_subplot(1, 2, 1, projection='3d')
+ax3d.plot_surface(x_vals, y_vals, z_vals, cmap='viridis', alpha=0.8)
+ax3d.plot(path_x, path_y, path_z, color='red', marker='o', label="Descent Path")
+ax3d.set_title("3D Surface and Gradient Descent")
+ax3d.set_xlabel("x")
+ax3d.set_ylabel("y")
+ax3d.set_zlabel("f(x, y)")
+ax3d.legend()
+
+# ──────────────────── Contour Plot ──────────────────────
+ax2d = fig.add_subplot(1, 2, 2)
+contours = ax2d.contour(x_vals, y_vals, z_vals, levels=50, cmap='viridis')
+ax2d.plot(path_x, path_y, color='red', marker='o', label="Descent Path")
+ax2d.set_title("Contour Plot of $f(x, y) = x^2 + y^2$")
+ax2d.set_xlabel("x")
+ax2d.set_ylabel("y")
+ax2d.legend()
+ax2d.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+
