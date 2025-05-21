@@ -48,7 +48,7 @@ def r2(y_hat, y_true):
 # Training Function
 # ────────────────────────────────
 def train_mode(phi_train, y_train, phi_test, y_test, iterations=1000):
-    model = SGDRegressor()
+    model = SGDRegressor(eta0=0.0001)
 
     train_mse_hist, test_mse_hist = [], []
     train_r2_hist, test_r2_hist = [], []
@@ -77,7 +77,7 @@ def train_mode(phi_train, y_train, phi_test, y_test, iterations=1000):
 # ────────────────────────────────
 # Train Model
 # ────────────────────────────────
-epochs = 1000
+epochs = 20000
 model, train_mse_hist, test_mse_hist, train_r2_hist, test_r2_hist = train_mode(
     phi_train, y_train, phi_test, y_test, iterations=epochs
 )
