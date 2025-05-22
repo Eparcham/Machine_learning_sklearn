@@ -18,14 +18,14 @@ y_test = test_df.iloc[:, -1].values.ravel()
 # ────────────────────────────────
 # Scaling
 # ────────────────────────────────
-scaler = StandardScaler()
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
+# scaler = StandardScaler()
+# x_train = scaler.fit_transform(x_train)
+# x_test = scaler.transform(x_test)
 
 # ────────────────────────────────
 # Polynomial Features
 # ────────────────────────────────
-degree = 3
+degree = 10
 poly = PolynomialFeatures(degree)
 phi_train = poly.fit_transform(x_train)
 phi_test = poly.transform(x_test)
