@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import missingno as msno
+from sklearn.preprocessing import LabelEncoder
 
 # Load the dataset
 df = pd.read_csv('./data/insurance.csv')
 
-# Show info and missing values
+# Basic info and missing value overview
 print("🔎 Dataset Information:")
 print(df.info())
 print("-" * 50)
@@ -14,92 +15,68 @@ print("📉 Missing Values Count (NaN):")
 print(df.isna().sum())
 print("-" * 50)
 
-# Plot missing values visually
+# Visualize missing data
 msno.matrix(df)
 plt.title("Missing Data Matrix", fontsize=16)
 plt.show()
 
 # ------------------------------------------
-# Automatically diagnose all missing features
+# Diagnose missing values column-wise
 # ------------------------------------------
-
 def diagnose_mv(df, mv_column):
     cols = df.columns
     flags = df[mv_column].isna()
-    fig,ax = plt.subplots(len(cols),3,figsize=(len(cols)+3,len(cols)+3),constrained_layout=True)
+    fig, ax = plt.subplots(len(cols), 3, figsize=(12, len(cols) * 3), constrained_layout=True)
     plt.rcParams['axes.grid'] = True
 
-    for i,col in enumerate(cols):
-        n1, bins,_ = ax[i,0].hist(df[col])
-        ax[i,0].set_title(f"{col} with mv")
+    for i, col in enumerate(cols):
+        n1, bins, _ = ax[i, 0].hist(df[col].dropna(), bins=20)
+        ax[i, 0].set_title(f"{col} (All)")
 
-        n2, bins,_ = ax[i,1].hist(df[col][~flags],bins=bins)
-        ax[i,1].set_title(f"{col} without mv")
+        n2, _, _ = ax[i, 1].hist(df.loc[~flags, col].dropna(), bins=bins)
+        ax[i, 1].set_title(f"{col} (Non-missing {mv_column})")
 
-        if col == "charges":
-            bins/=1e4
-
-        ax[i,2].bar(bins[:-1], np.abs(n2-n1))
-        ax[i,2].set_title(f"{col} Difference")
+        ax[i, 2].bar(bins[:-1], np.abs(n2 - n1), width=np.diff(bins))
+        ax[i, 2].set_title(f"{col} (Diff)")
     plt.show()
 
-if 0:
-    diagnose_mv(df, 'age')
+# Example usage (disabled by default)
+# diagnose_mv(df, 'bmi')
 
-    diagnose_mv(df, 'bmi')
+# ------------------------------------------
+# Handle missing values
+# ------------------------------------------
 
+# 1. NCAR (e.g., 'children' likely Missing Completely At Random)
+df['children'].fillna(df['children'].mode()[0], inplace=True)
 
-## resolve missing value
+# 2. MAR (e.g., 'bmi' depends on 'smoker')
+median_bmi_smoker = df.loc[df['smoker'] == 'yes', 'bmi'].median()
+df['bmi'].fillna(median_bmi_smoker, inplace=True)
 
-# NCAR
-mode_children = df['children'].mode().values
-print(mode_children)
-
-
-df['children'] = df['children'].fillna(mode_children[0])
-
-print(df['children'].isna().sum())
-
-## MAR
-flags = df.smoker=='yes'
-print(flags.sum())
-m = df.bmi[flags].median()
-# df.bmi.fillna(m, inplace=True)
-df['bmi'] = df['bmi'].fillna(m)
-msno.matrix(df)
-plt.title("Missing Data Matrix", fontsize=16)
-plt.show()
-
-## NMAR
-
-flags = df['age'].isna()
+# 3. NMAR (e.g., 'age' - drop if crucial)
 df.dropna(subset=['age'], inplace=True)
+
+# Confirm no missing values remain
 msno.matrix(df)
-plt.title("Missing Data Matrix", fontsize=16)
+plt.title("Missing Data Matrix After Cleaning", fontsize=16)
 plt.show()
 
+# ------------------------------------------
+# Encoding categorical variables
+# ------------------------------------------
 
-## encode  lable encoding good for ordinery feature
-print(df.info())
-print(df.select_dtypes(include='object'))
+# One-hot encoding for non-ordinal categorical variables
+df_encoded = pd.get_dummies(df, drop_first=True, dtype=np.float64, columns=['sex', 'smoker', 'region'])
+print("🔢 Encoded Dataset Preview:")
+print(df_encoded.head(10))
 
-df_new = pd.get_dummies(df,drop_first=True, dtype=np.float64,columns=['smoker','sex'])
-print(df_new.head(10))
-
-## one-hot encoding
-df_new = pd.get_dummies(df_new,columns=['region'], drop_first=True, dtype=np.float64)
-print(df_new.head(10))
-
-## if type data is not good view and not we can use select dummies!
-
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
-
+# Optional: Label encoding (not used here as one-hot is preferred for non-ordinal)
+label_encoded_df = df.copy()
 label_encoder = LabelEncoder()
+for col in label_encoded_df.select_dtypes(include='object'):
+    label_encoded_df[col] = label_encoder.fit_transform(label_encoded_df[col])
+    print(f"{col}: {label_encoder.classes_}")
 
-dfc = df.copy()
-
-for col in dfc.select_dtypes(include='object').columns:
-    dfc[col] = label_encoder.fit_transform(dfc[col])
-    print(label_encoder.classes_)
-
-print(dfc)
+print("\n🔤 Label Encoded Data Preview:")
+print(label_encoded_df.head(10))
